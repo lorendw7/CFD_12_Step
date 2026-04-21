@@ -1,4 +1,5 @@
-# CFD Learning
+# CFD 12 Step
+
 
 > A Julia and Python implementation & learning notes for Computational Fluid Dynamics (CFD), adapted from the classic open-source tutorial *CFD Python: the 12 steps to Navier-Stokes equations*.
 
