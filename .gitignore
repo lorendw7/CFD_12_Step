@@ -1,0 +1,12 @@
+# Julia
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+/deps/deps.jl
+
+# Pluto / editor / OS
+.CondaPkg/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
