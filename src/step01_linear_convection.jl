@@ -1,8 +1,15 @@
 ### A Pluto.jl notebook ###
-# v0.19.46
+# v1.0.1
 
 using Markdown
 using InteractiveUtils
+
+# ╔═╡ a1000000-0000-0000-0000-000000000002
+begin
+	import Pkg
+	Pkg.activate(Base.current_project(@__DIR__))
+	using Plots
+end
 
 # ╔═╡ a1000000-0000-0000-0000-000000000001
 md"""
@@ -17,15 +24,12 @@ Update formula you derived in Step 0:
 Fill every `# TODO`. Do **not** look up the answer — derive it from `docs/step01_linear_convection.md`.
 """
 
-# ╔═╡ a1000000-0000-0000-0000-000000000002
-using Plots
-
 # ╔═╡ a1000000-0000-0000-0000-000000000003
 md"## 1. Parameters"
 
 # ╔═╡ a1000000-0000-0000-0000-000000000004
 begin
-	nx = 41                 # number of grid points
+	nx = 81                 # number of grid points
 	L  = 2.0                # domain length
 	dx = L / (nx - 1)       # grid spacing Δx
 	nt = 25                 # number of time steps
@@ -44,6 +48,7 @@ function initial_condition(x, dx)
 	u = ones(length(x))
 	# TODO: set u = 2 for all points with 0.5 ≤ x ≤ 1.0, leave the rest = 1.
 	# Hint: loop over indices, or use a boolean mask  u[0.5 .<= x .<= 1.0] .= 2
+	u[0.5 .<= x .<= 1.0] .= 2
 	return u
 end
 
@@ -60,6 +65,7 @@ function solve_linear_convection(nx, nt, dx, dt, c)
 			# TODO: implement the update formula.
 			# u[i] = un[i] - c*dt/dx * (un[i] - un[i-1])
 			# Write it yourself from the math — don't paste the hint line.
+			u[i] = un[i] - c * dt / dx * (un[i] - un[i-1])
 		end
 	end
 	return u

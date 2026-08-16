@@ -47,12 +47,13 @@ Then open `src/stepNN_*.jl` from the Pluto home page.
 | [`docs/math_refresher.md`](docs/math_refresher.md) | The 4 ideas CFD needs (slope, `∂`, `Δ`, grid). Start here. | ✅ |
 | [`docs/julia_primer.md`](docs/julia_primer.md) | Just-enough Julia (arrays, 1-indexing, `copy`, loops, `Plots`). | ✅ |
 | [`docs/glossary.md`](docs/glossary.md) | One-line plain definitions. Look up anything. | ✅ |
+| [`docs/parameters.md`](docs/parameters.md) | `nx`, `dx`, `dt`, `σ` — what each knob does, and every experiment's result in one table. | ✅ |
 | [`docs/step00_foundations.md`](docs/step00_foundations.md) | One equation becomes one line of code. | ✅ |
 
 **Phase 1 — 1-D** 🔄 *(build the whole core pattern)*
 
-- [x] Step 1 ⭐ — 1-D Linear Convection — [doc](docs/step01_linear_convection.md) · [notebook](src/step01_linear_convection.jl)
-- [ ] Step 2 — 1-D Nonlinear Convection
+- [x] Step 1 ⭐ — 1-D Linear Convection — [doc](docs/step01_linear_convection.md) · [notebook](src/step01_linear_convection.jl) ✅ *(solved: σ=0.5 diffuses, σ=1 is exact, σ=1.25 blows up)*
+- [ ] Step 2 — 1-D Nonlinear Convection — [doc](docs/step02_nonlinear_convection.md) · [notebook](src/step02_nonlinear_convection.jl) *(materials ready — fill the `# TODO`s yourself)*
 - [ ] Step 3 — 1-D Diffusion (+ CFL stability)
 - [ ] Step 4 — 1-D Burgers' Equation
 

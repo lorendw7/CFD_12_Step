@@ -18,9 +18,12 @@ Look anything up here the moment it feels unfamiliar. Every entry is one sentenc
 | superscript `n` (`u^n`) | Which time step: `n` = now, `n+1` = next instant. |
 | discretization | Turning a smooth equation into operations on a finite list of numbers. |
 | finite difference | Approximating a derivative as a subtraction of neighbor values over the spacing. |
-| forward difference | `(u[i+1] − u[i]) / Δx` — uses the point to the **right**. |
-| backward difference | `(u[i] − u[i−1]) / Δx` — uses the point to the **left** (upwind). |
-| central difference | `(u[i+1] − 2u[i] + u[i−1]) / Δx²` — for the **second** derivative. |
+| stencil | Which neighbouring points a formula reads in order to approximate a derivative. |
+| forward difference | `(u[i+1] − u[i]) / Δx` — uses the point to the **right**. In time: `(u^{n+1} − u^n)/Δt`, which is why the future value is the only unknown. |
+| backward difference | `(u[i] − u[i−1]) / Δx` — uses the point to the **left**. |
+| central difference (1st derivative) | `(u[i+1] − u[i−1]) / (2Δx)` — uses **both** neighbours; more accurate, but unstable for pure convection with a forward time step. |
+| central difference (2nd derivative) | `(u[i+1] − 2u[i] + u[i−1]) / Δx²` — the stencil for `∂²u/∂x²`, used from Step 3 on. |
+| upwind | Choosing the neighbour on the side the flow is *coming from* (left when the speed is positive). Getting this side wrong makes the scheme blow up, not merely inaccurate. |
 | convection / advection | Stuff being carried along by a flow (a shape moving downstream). |
 | diffusion | Stuff spreading out and smoothing (heat evening out, ink in water). |
 | time marching | Repeatedly updating the whole grid to step forward in time. |

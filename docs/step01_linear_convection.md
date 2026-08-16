@@ -67,8 +67,20 @@ would use the already-updated `i-1`). This is the in-place bug from Step 0 §sel
 - [ ] The hat's peak should still be near 2 but slightly lower. If it shoots above
       2 or oscillates wildly, your scheme is unstable — check `c·Δt/Δx`.
 - [ ] Compute the Courant number `σ = c·Δt/Δx`. Is it ≤ 1?
-- [ ] Experiment: raise `nx` to 81, keep `nt=25`, `Δt=0.025`. What happens, and why?
-      (Hint: `Δx` shrank, so `σ` grew past 1.) Predict before you run.
+- [ ] Experiment A — raise `nx` to 81, keep `nt=25`, `Δt=0.025`. Compute `σ` first,
+      then predict, then run. You get `σ = 1` *exactly*, and the update collapses to
+      `u[i] = un[i-1]`: every point simply copies its left neighbour, so the shape
+      shifts one cell per step with **zero** smearing. The hat stays perfectly
+      square — the only values left in the array are `1.0` and `2.0`.
+- [ ] Experiment B — now raise `nx` to 101 (`Δx = 0.02`, so `σ = 1.25 > 1`).
+      Predict, then run. The solution explodes to roughly ±2750 after 25 steps.
+      Rewrite the update as a mixture, `u[i] = (1-σ)·un[i] + σ·un[i-1]`, and you can
+      see why: `σ > 1` makes the weight on `un[i]` **negative**, so every step
+      amplifies the error instead of averaging it away.
+- [ ] Takeaway: `σ < 1` is stable but diffusive; `σ = 1` is exact but a knife edge;
+      `σ > 1` blows up. That rule is the **CFL condition** — in one time step the
+      wave must not travel further than one grid cell, or the grid points never
+      "see" the information passing them.
 - [ ] Why `i = 2:nx` and not `i = 1:nx`? What boundary point did you skip and why?
 
 When all boxes are checked, ping me and I'll review your `.jl`/notebook.
