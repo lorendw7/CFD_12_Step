@@ -55,7 +55,7 @@ Then open `src/stepNN_*.jl` from the Pluto home page.
 - [x] Step 1 ⭐ — 1-D Linear Convection — [doc](docs/step01_linear_convection.md) · [notebook](src/step01_linear_convection.jl) ✅ *(solved: σ=0.5 diffuses, σ=1 is exact, σ=1.25 blows up)*
 - [x] Step 2 ⭐ — 1-D Nonlinear Convection — [doc](docs/step02_nonlinear_convection.md) · [notebook](src/step02_nonlinear_convection.jl) ✅ *(solved: the bump steepens into a shock and outruns the linear one)*
 - [x] Step 3 ⭐⭐ — 1-D Diffusion — [doc](docs/step03_diffusion.md) · [notebook](src/step03_diffusion.jl) ✅ *(solved: corners die first and the flat top holds until the slopes eat it; `r>1/2` saws the grid apart at exactly `|1-4r|` per step; `ν` cancels out of the update; clamped ends drain the bump to `u ≡ 1`)*
-- [ ] Step 4 — 1-D Burgers' Equation
+- [ ] Step 4 ⭐⭐⭐ — 1-D Burgers' Equation — [doc](docs/step04_burgers.md) · [notebook](src/step04_burgers.jl) 🔄 *(convection + diffusion in one equation; periodic domain; first step with an exact solution to measure error against)*
 
 **Phase 2 — 2-D** *(same ideas, one more dimension)*
 

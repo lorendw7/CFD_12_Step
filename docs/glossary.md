@@ -44,4 +44,9 @@ Look anything up here the moment it feels unfamiliar. Every entry is one sentenc
 | invariant | A property the true solution must have whatever the answer turns out to be (total conserved, peak falling, profile symmetric). Checking invariants is how you verify code that has no known answer to compare against. |
 | stability | Whether the numbers stay sensible (stable) or explode to infinity (unstable). |
 | numerical diffusion | Artificial smearing introduced by the scheme, not by real physics. |
+| Burgers' equation | `∂u/∂t + u∂u/∂x = ν∂²u/∂x²` — nonlinear convection and diffusion in one equation. The "toy Navier–Stokes": the same steepening-vs-smoothing fight, minus pressure and extra dimensions. |
+| periodic boundary condition | The domain wraps into a ring: what leaves the right edge re-enters on the left. Points `1` and `nx` are the same physical place, so point `1`'s left neighbour is `nx-1`, not `nx`. |
+| shock thickness | The width the steepening front settles at when convection and viscosity balance — roughly `ν / u_jump`. Small `ν`, razor-thin front; large `ν`, gentle ramp. |
+| Cole–Hopf transform | The substitution that turns Burgers' equation into the plain diffusion equation, which is why Step 4 has an exact solution on paper. Take it as given; you only use its output. |
+| exact (analytical) solution | A formula giving the true answer at every `x` and `t`. Rare, and precious: it converts "does the picture look right?" into a measured error number. |
 | Navier–Stokes | The full equations of fluid motion — the final destination (Steps 11–12). |
