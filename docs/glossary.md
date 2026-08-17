@@ -29,8 +29,15 @@ Look anything up here the moment it feels unfamiliar. Every entry is one sentenc
 | time marching | Repeatedly updating the whole grid to step forward in time. |
 | initial condition (IC) | The starting values of `u` at time 0. |
 | boundary condition (BC) | The rule for the values at the edges of the grid. |
+| second derivative `∂²u/∂x²` | The slope of the slope — in plain words, **curvature**: how much the profile bends (∪ positive, ∩ negative, straight zero). |
+| `ν` (nu), diffusion coefficient | How eagerly the stuff spreads; in fluids the *kinematic viscosity*, in heat problems the thermal diffusivity. |
+| Taylor series | The rule that lets you predict a function's value a small step away from its slopes; adding the left and right expansions cancels the odd terms and hands you the second-derivative stencil. |
+| order of accuracy | How fast the error shrinks when you refine: first order = halve `Δx`, halve the error; second order = halve `Δx`, quarter the error. |
 | Courant number σ | `c·Δt/Δx`; how far the wave moves per step relative to the grid spacing. |
+| von Neumann number `r` | `ν·Δt/Δx²`; the diffusion counterpart of σ, and it must stay `≤ 1/2`. |
 | CFL condition | A limit (often `σ ≤ 1`) you must respect or the numbers blow up. |
+| Dirichlet boundary condition | Holding the value itself fixed at the edge of the grid (e.g. both ends pinned at `u = 1`). |
+| explicit scheme | Each new value is written straight from old ones — simple, but the time step is capped by a stability rule (everything in these 12 steps). |
 | stability | Whether the numbers stay sensible (stable) or explode to infinity (unstable). |
 | numerical diffusion | Artificial smearing introduced by the scheme, not by real physics. |
 | Navier–Stokes | The full equations of fluid motion — the final destination (Steps 11–12). |

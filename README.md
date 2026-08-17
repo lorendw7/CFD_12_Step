@@ -53,8 +53,8 @@ Then open `src/stepNN_*.jl` from the Pluto home page.
 **Phase 1 — 1-D** 🔄 *(build the whole core pattern)*
 
 - [x] Step 1 ⭐ — 1-D Linear Convection — [doc](docs/step01_linear_convection.md) · [notebook](src/step01_linear_convection.jl) ✅ *(solved: σ=0.5 diffuses, σ=1 is exact, σ=1.25 blows up)*
-- [ ] Step 2 — 1-D Nonlinear Convection — [doc](docs/step02_nonlinear_convection.md) · [notebook](src/step02_nonlinear_convection.jl) *(materials ready — fill the `# TODO`s yourself)*
-- [ ] Step 3 — 1-D Diffusion (+ CFL stability)
+- [x] Step 2 ⭐ — 1-D Nonlinear Convection — [doc](docs/step02_nonlinear_convection.md) · [notebook](src/step02_nonlinear_convection.jl) ✅ *(solved: the bump steepens into a shock and outruns the linear one)*
+- [ ] Step 3 ⭐⭐ — 1-D Diffusion — [doc](docs/step03_diffusion.md) · [notebook](src/step03_diffusion.jl) 🔄 *(solver done: corners die first, the flat top holds until the slopes eat it, area conserved — numerical checks and experiments A–D still open)*
 - [ ] Step 4 — 1-D Burgers' Equation
 
 **Phase 2 — 2-D** *(same ideas, one more dimension)*

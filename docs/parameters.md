@@ -15,6 +15,7 @@
 | number of steps | `nt` | How many ticks to run | `25` | **you** |
 | time step | `dt` | Length of one tick | `0.025` | **you**, but limited (see §4) |
 | wave speed | `c` | How fast the shape travels (Step 1 only) | `1.0` | the physics |
+| diffusion coefficient | `nu` | How eagerly the stuff spreads (Step 3 on) | `0.3` | the physics |
 
 Two more that are never typed in but matter just as much:
 
@@ -22,6 +23,11 @@ Two more that are never typed in but matter just as much:
 |---|---|---|---|
 | total time | `t = nt·dt` | How much physical time you simulated | `0.625` |
 | Courant number | `σ = c·dt/dx` | How many cells the wave crosses per tick | `0.5` |
+| von Neumann number | `r = nu·dt/dx²` | The diffusion stability number (Step 3 on) | `0.2` |
+
+From Step 3 on the habit flips: instead of typing `dt` and checking the stability
+number afterwards, you **choose** the stability number and derive
+`dt = r·dx²/nu`. Then refining the grid can never break stability by accident.
 
 ---
 
@@ -86,6 +92,19 @@ on the grid and has to be re-checked as the solution changes:
 
 $$\sigma_{\max} = \frac{\max(u)\,\Delta t}{\Delta x} \le 1$$
 
+### Diffusion has its own, harsher rule
+
+Convection limits `dt` through `dx`. Diffusion limits it through `dx²`:
+
+$$r = \frac{\nu\,\Delta t}{\Delta x^{2}} \le \frac{1}{2}
+\qquad\Longleftrightarrow\qquad
+\Delta t \le \frac{\Delta x^{2}}{2\nu}$$
+
+Because `Δx` is squared, doubling `nx` forces `Δt` down by **four**, so the same
+physical time costs eight times the work. Both rules apply at once from Step 4 on,
+where convection and diffusion appear in the same equation — the allowed `Δt` is
+then the smaller of the two.
+
 The three regimes, all of which you have now seen with your own numbers:
 
 | `σ` | Behaviour |
@@ -100,7 +119,10 @@ The three regimes, all of which you have now seen with your own numbers:
 
 Domain `L = 2`, hat initial condition (`u = 2` on `0.5 ≤ x ≤ 1`, else `u = 1`).
 
-| Run | `nx` | `dx` | `dt` | `σ` | What came out |
+The stability column holds `σ` for the convection runs and `r` for the diffusion
+ones — each step's own stability number.
+
+| Run | `nx` | `dx` | `dt` | `σ` / `r` | What came out |
 |---|---|---|---|---|---|
 | Step 1 baseline | 41 | 0.05 | 0.025 | 0.5 | Hat moved `0.625`, corners rounded off, peak fell `2 → 1.97` |
 | Step 1 refined | 81 | 0.025 | 0.025 | **1.0** | Hat moved `0.625` with a **perfectly square** profile — only `1.0` and `2.0` remain in the array |
@@ -108,6 +130,7 @@ Domain `L = 2`, hat initial condition (`u = 2` on `0.5 ≤ x ≤ 1`, else `u = 1
 | Step 1, wrong stencil | 41 | 0.05 | 0.025 | 0.5 | Forward (downwind) difference reached `3×10⁶` — **`σ` was legal and it still blew up**; direction beats magnitude |
 | Step 2 baseline | 41 | 0.05 | 0.025 | 1.0 (max) | Bump travelled `0.83` in the time the linear one travelled `0.50`; profile asymmetric; the `u = 2` plateau shrank `11 → 1` points |
 | Step 2, smaller `dt` | 41 | 0.05 | 0.0125 | 0.5 (max) | The rarefaction ramp on the back face finally appears — but the peak is smeared down to `1.84` |
+| Step 3 baseline (`ν = 0.3`) | 41 | 0.05 | 0.001667 | `r = 0.2` | Corners gone by `n=5` while the flat top still sat at `2.0`; peak `2 → 1.995 → 1.950` at `n = 5, 10, 20`; area `0.5500 → 0.5500`; symmetric to `8×10⁻⁵` |
 
 ---
 
