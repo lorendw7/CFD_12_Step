@@ -41,7 +41,7 @@ begin
 	nx    = 41                 # number of grid points
 	L     = 2.0                # domain length
 	dx    = L / (nx - 1)       # grid spacing Δx
-	nt    = 20                 # number of time steps
+	nt    = 500                 # number of time steps
 	nu    = 0.3                # diffusion coefficient ν
 	sigma = 0.2                # stability number r = ν·Δt/Δx²  (must be ≤ 0.5)
 
@@ -98,7 +98,7 @@ md"## 4. Watch it flatten"
 begin
 	p = plot(xlabel = "x", ylabel = "u", ylims = (0.8, 2.2), title = "1-D diffusion")
 	plot!(p, x, initial_condition(x), label = "n=0", lw = 2, ls = :dash)
-	for n in (5, 10, 20)
+	for n in (20, 100, 500)
 		plot!(p, x, solve_diffusion(n), label = "n=$n", lw = 2)
 	end
 	p
@@ -112,29 +112,57 @@ Do these with numbers, not with your eyes. Each line answers one question from t
 doc's checklist.
 """
 
+# ╔═╡ 223a23a0-b9a7-4492-9642-2842ce1659be
+maximum([1, 5, 3])
+
+# ╔═╡ 7fb06411-3248-4ced-a53b-f7d36e07c91b
+[1, 5, 3] .- 1
+
+# ╔═╡ df6a6a8c-5509-4e0b-a6a7-5ff2dc3c78f6
+sum([1, 5, 3])
+
+# ╔═╡ 9f838c60-aec5-4e00-b502-3dd554d535d1
+c = 0.75 / 0.05 + 1
+
+# ╔═╡ 081eae46-b0b8-4c28-b6c8-f2104f6a1333
+k = c - 1
+
+# ╔═╡ f028404b-e6be-413f-9f2d-31aec452ecc0
+k1 = 41 - c
+
 # ╔═╡ a3000000-0000-0000-0000-00000000000c
 begin
 	u20 = solve_diffusion(nt)
 
 	# TODO: the stability number actually in force. Should be 0.2.
-	r_actual = 0
+	r_actual = nu * dt / dx^2
 
 	# TODO: peak height at n = 0, 5, 10, 20 — must fall, never rise.
-	peaks = Float64[]
+	peaks = [maximum(solve_diffusion(i)) for i in (0, 5, 10, 20)]
 
 	# TODO: area of the bump above the background, at n = 0 and n = 20.
 	# Hint: `sum(u .- 1) * dx`
-	area0  = 0
-	area20 = 0
+	area0  = sum(solve_diffusion(0) .- 1) * dx
+	area20 = sum(u20 .- 1) * dx
 
 	# TODO: symmetry about x = 0.75. The hat is symmetric and diffusion has no
 	# preferred direction, so the profile must stay symmetric.
 	# Hint: compare u20 with `reverse(u20)` — but only over the stretch of grid
 	# points that is itself centred on x = 0.75. Work out which indices those are.
-	symmetry_error = 0
+	w = u20[1:31]
+	symmetry_error = maximum(abs.(w .- reverse(w)))
 
 	(; r_actual, peaks, area0, area20, symmetry_error)
 end
+
+# ╔═╡ d2495435-2b39-41fe-a38c-f6fb54030aa6
+reverse(w)
+
+# ╔═╡ 8f725546-3d21-4311-a5d3-6982982cc658
+w .- reverse(w)
+
+# ╔═╡ f8dfbe07-18d0-4947-a47b-cf1aa9405a81
+abs.(w .- reverse(w))
 
 # ╔═╡ a3000000-0000-0000-0000-00000000000d
 md"""
@@ -166,5 +194,14 @@ Record every result in `docs/parameters.md` §5, same as Steps 1–2.
 # ╟─a3000000-0000-0000-0000-000000000009
 # ╠═a3000000-0000-0000-0000-00000000000a
 # ╟─a3000000-0000-0000-0000-00000000000b
+# ╠═223a23a0-b9a7-4492-9642-2842ce1659be
+# ╠═7fb06411-3248-4ced-a53b-f7d36e07c91b
+# ╠═df6a6a8c-5509-4e0b-a6a7-5ff2dc3c78f6
+# ╠═9f838c60-aec5-4e00-b502-3dd554d535d1
+# ╠═081eae46-b0b8-4c28-b6c8-f2104f6a1333
+# ╠═f028404b-e6be-413f-9f2d-31aec452ecc0
 # ╠═a3000000-0000-0000-0000-00000000000c
+# ╠═d2495435-2b39-41fe-a38c-f6fb54030aa6
+# ╠═8f725546-3d21-4311-a5d3-6982982cc658
+# ╠═f8dfbe07-18d0-4947-a47b-cf1aa9405a81
 # ╟─a3000000-0000-0000-0000-00000000000d

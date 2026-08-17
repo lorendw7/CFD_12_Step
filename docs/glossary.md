@@ -38,6 +38,10 @@ Look anything up here the moment it feels unfamiliar. Every entry is one sentenc
 | CFL condition | A limit (often `σ ≤ 1`) you must respect or the numbers blow up. |
 | Dirichlet boundary condition | Holding the value itself fixed at the edge of the grid (e.g. both ends pinned at `u = 1`). |
 | explicit scheme | Each new value is written straight from old ones — simple, but the time step is capped by a stability rule (everything in these 12 steps). |
+| grid-scale sawtooth | The `+ − + −` cell-to-cell oscillation that an explicit scheme amplifies first when it goes unstable — the visible fingerprint of a broken stability rule. |
+| steady state | The profile that has stopped changing. For diffusion with both ends clamped at `u = 1`, it is the flat line `u ≡ 1`. |
+| similarity (`ν·t`) | Diffusion keeps no clock of its own: only the product `ν·t` decides how far the profile has spread, so a tenfold weaker `ν` watched ten times as long looks identical. |
+| invariant | A property the true solution must have whatever the answer turns out to be (total conserved, peak falling, profile symmetric). Checking invariants is how you verify code that has no known answer to compare against. |
 | stability | Whether the numbers stay sensible (stable) or explode to infinity (unstable). |
 | numerical diffusion | Artificial smearing introduced by the scheme, not by real physics. |
 | Navier–Stokes | The full equations of fluid motion — the final destination (Steps 11–12). |

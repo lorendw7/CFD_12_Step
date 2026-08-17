@@ -131,6 +131,10 @@ ones — each step's own stability number.
 | Step 2 baseline | 41 | 0.05 | 0.025 | 1.0 (max) | Bump travelled `0.83` in the time the linear one travelled `0.50`; profile asymmetric; the `u = 2` plateau shrank `11 → 1` points |
 | Step 2, smaller `dt` | 41 | 0.05 | 0.0125 | 0.5 (max) | The rarefaction ramp on the back face finally appears — but the peak is smeared down to `1.84` |
 | Step 3 baseline (`ν = 0.3`) | 41 | 0.05 | 0.001667 | `r = 0.2` | Corners gone by `n=5` while the flat top still sat at `2.0`; peak `2 → 1.995 → 1.950` at `n = 5, 10, 20`; area `0.5500 → 0.5500`; symmetric to `8×10⁻⁵` |
+| Step 3 **A** — over the line | 41 | 0.05 | 0.005 | **`r = 0.6`** | Sawtooth blow-up. Peaks *rose*: `2 → 2.12 → 3.48 → 42.9`. Late growth measured `1.3985` per step against the predicted `\|1-4r\| = 1.4`. Area barely moved (`0.505`) — the `+`/`−` teeth cancel inside `sum` |
+| Step 3 **B** — refined grid | 81 | 0.025 | 0.000417 | `r = 0.2` | `dt` fell to a **quarter**, so `nt = 20` only reached `t = 0.0083` — the crisper picture is an *earlier* one, not a better one. `nt = 80` reproduces the baseline (max difference `0.035`, the finer grid being the more accurate) at **8× the work** |
+| Step 3 **C** — weaker `ν` | 41 | 0.05 | 0.01667 | `r = 0.2` | `ν = 0.03`: `dt` ×10, `t` ×10, profile **bitwise identical** to the baseline (also checked at `ν = 3.0`). Deriving `dt` from `r` cancels `ν` out of the update entirely; only the product `ν·t = 0.01` decides the shape |
+| Step 3 **D** — long run | 41 | 0.05 | 0.001667 | `r = 0.2` | `nt = 500`: the bump reaches the clamped ends and starts **leaking**. Area `0.550 → 0.338` (61% left), peak `→ 1.27`, crest drifting from `x = 0.75` toward `x = 1`. By `nt = 5000` only 0.2% remains; the steady state is `u ≡ 1` |
 
 ---
 
@@ -148,3 +152,19 @@ Whatever the step, ask these in order.
 4. **What was lost?** Compare the peak with its starting value and the total
    `sum(u)*dx` with its starting value. A falling peak with conserved total means
    the scheme is diffusing, not leaking.
+
+### A fifth question, about the other four
+
+**Does the check still apply?** Every invariant carries a condition. Conservation of
+`sum(u .- 1)*dx` holds only *while the bump has not reached the boundaries* — run
+Step 3 to `nt = 500` and the clamped ends drain it away, so the check that was
+correct at `n = 20` is simply wrong at `n = 500`. Confirm the condition before
+trusting the verdict; a ruler used in the wrong place is worse than no ruler.
+
+Two more habits from Step 3, both cheap and both hard-won:
+
+- **Compare at equal physical time `t = nt·dt`, never at equal step count.** Once
+  `dt` is derived from the grid, `nt` stops being a measure of anything physical.
+- **Each check is blind to whatever it aggregates away.** `sum` and `maximum` are
+  immune to order, so no directional bug can ever show up in them — only a
+  point-by-point comparison (the symmetry check) sees those. Use them together.

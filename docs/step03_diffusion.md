@@ -4,6 +4,15 @@
 > Difficulty: ⭐⭐ (the maths is new; the code is still ~10 lines).
 > Prereq: Steps 1–2 finished.
 
+**Step 3 in three lines.** Everything else on this page is commentary — come back
+for it when you want it, but these three carry the step:
+
+1. `u[i] = un[i] + nu*dt/dx^2 * (un[i+1] - 2un[i] + un[i-1])` — every point is
+   pulled toward the average of its two neighbours.
+2. `r = nu*dt/dx^2 ≤ 1/2`, or the pull turns into a push and the grid saws itself
+   apart.
+3. Never type `dt` in. Derive it: `dt = r*dx^2/nu`.
+
 ---
 
 ## 0. The everyday picture first
@@ -166,9 +175,33 @@ value it averages, so nothing can grow. The moment `r > 1/2` the middle weight
 explodes. (Compare Step 1's `u[i] = (1−σ)·un[i] + σ·un[i-1]` — the same argument,
 the same failure mode.)
 
-Note the *shape* of a diffusion blow-up: neighbouring points fly apart in opposite
-directions, so you see a violent zig-zag (`+`, `−`, `+`, `−` …) rather than a smooth
-runaway. It is a recognisable fingerprint.
+### The exact amplification factor
+
+The weights argument tells you *that* `r > 1/2` fails. One more line tells you *how
+fast*. Feed the update the worst profile a grid can hold — a pure cell-to-cell
+sawtooth, `u_i = (-1)^i`:
+
+$$u_i^{n+1} = (1-2r)(-1)^i + r(-1)^{i+1} + r(-1)^{i-1} = (1-4r)\,(-1)^i$$
+
+The sawtooth keeps its shape exactly and is multiplied by `1-4r` every step:
+
+| `r` | `1-4r` | the sawtooth, each step |
+|---|---|---|
+| `0.2` | `+0.2` | shrinks to a fifth — wiped out on sight |
+| `0.5` | `−1.0` | flips sign, same size — the knife edge |
+| `0.6` | `−1.4` | **grows 1.4×**, without limit |
+
+Demanding `|1-4r| ≤ 1` gives `0 ≤ r ≤ 1/2` exactly. That is where the number comes
+from — and it is measurable, not decorative: at `r = 0.6` the late-time growth of
+`max|u|` settles on `1.3985` per step against the predicted `1.4`.
+
+Note the *shape* of the failure: neighbouring points fly apart in opposite
+directions, so it is a violent grid-scale zig-zag rather than a smooth runaway.
+Step 1's blow-up alternates sign too — that much is generic, because the sawtooth is
+the mode every explicit scheme amplifies first. What differs is the **envelope**:
+Step 1's oscillation stays localised near the original discontinuity and trails off
+to one side, because convection carries the error downstream; the diffusion sawtooth
+grows symmetrically in both directions and fills the domain.
 
 ### The `Δx²` is the expensive part
 
