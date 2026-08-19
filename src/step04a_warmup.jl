@@ -41,7 +41,7 @@ begin
 	nu    = 0.3                # diffusion coefficient ν
 	sigma = 0.2                # stability number r = ν·dt/dx²
 
-	dt = missing               # TODO 1: same as Step 3 — solve r = nu*dt/dx^2 for dt.
+	dt = sigma / nu * dx^2               # TODO 1: same as Step 3 — solve r = nu*dt/dx^2 for dt.
 
 	x = range(0, L, length = nx)
 end
@@ -72,7 +72,7 @@ function solve_burgers(nt)
 		un = copy(u)
 		for i in 2:nx-1
 			# TODO 2: Step 2's convection term and Step 3's diffusion term, added.
-			u[i] = missing
+			u[i] = un[i] - un[i] * dt / dx * (un[i] - un[i - 1]) + nu * dt / dx^2 * (un[i + 1] - 2 * un[i] + un[i - 1])
 		end
 	end
 	return u
@@ -104,8 +104,8 @@ begin
 	u_end = solve_burgers(nt)
 
 	# TODO 3: the two stability numbers actually in force.
-	sigma_actual = missing     # convection: u_max·dt/dx, with u_max = maximum(u_end). Must be ≤ 1.
-	r_actual     = missing     # diffusion:  nu·dt/dx^2.                              Must be ≤ 0.5.
+	sigma_actual = maximum(u_end) * dt / dx     # convection: u_max·dt/dx, with u_max = maximum(u_end). Must be ≤ 1.
+	r_actual     = nu * dt / dx^2     # diffusion:  nu·dt/dx^2.                              Must be ≤ 0.5.
 
 	(; sigma_actual, r_actual, peak = maximum(u_end))
 end

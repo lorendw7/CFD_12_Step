@@ -168,14 +168,51 @@ are active, so **both must hold**, and the binding one is whichever gives the sm
 
 $$\Delta t \le \min\left(\frac{\Delta x}{u_{\max}},\ \frac{\Delta x^{2}}{2\nu}\right)$$
 
-With the numbers below (`ν = 0.07`, `Δx ≈ 0.063`, `u_max ≈ 8`), work out both limits
+With the numbers below (`ν = 0.07`, `Δx ≈ 0.063`, `u_max ≈ 7`), work out both limits
 before you run and note which one is doing the constraining. The answer flips as you
 refine the grid, because one limit shrinks like `Δx` and the other like `Δx²` — that
 is worth seeing once with your own numbers.
 
-The recipe here follows the original course: `dt = dx * nu`. That is not a law of
-nature, just a choice that happens to satisfy both rules comfortably for these
-parameters. Check that it does; do not trust it.
+**But the two separate rules are necessary, not sufficient.** What governs is the
+*merged* update, so collect it as a weighted average of the three old values:
+
+```
+u[i]_new  =  r·u[i+1]  +  (1 − σ − 2r)·u[i]  +  (σ + r)·u[i-1]
+```
+
+The three weights sum to exactly 1. As long as none of them is negative, the new
+value is a genuine average of old values — and an average can never leave the range
+of the numbers it averages, which is precisely what "stable" means. Only the middle
+weight can go negative, so the condition that actually governs is
+
+$$\sigma + 2r \le 1$$
+
+This is strictly stronger than the two rules above. A run with `σ = 0.25` and
+`r = 0.45` passes both of them (`0.25 ≤ 1`, `0.45 ≤ 0.5`) yet has `σ + 2r = 1.15`;
+measured, that solution develops 57 sign changes along the profile and dips to
+`u = −1.09` — negative velocities that no physics put there. Halve `Δt` so that
+`σ + 2r = 0.57` and the same run is clean.
+
+Solving `σ + 2r ≤ 1` for `Δt` gives a recipe that does not lie:
+
+$$\Delta t \le \frac{1}{\dfrac{u_{\max}}{\Delta x} + \dfrac{2\nu}{\Delta x^{2}}}$$
+
+In code, with a safety factor and a fixed upper bound for `u_max` (the saw-tooth peak
+stays under 8 for every `ν` in these experiments):
+
+```julia
+dt = 0.8 / (8/dx + 2*nu/dx^2)
+```
+
+Use the literal `8`, not `maximum(u0)`: the parameters cell defines `ν`, which the
+exact-solution cell needs, which the cell building `u0` needs — so reaching back for
+`u0` in the parameters cell is a cyclic reference and Pluto will refuse it.
+
+The recipe from the original course, `dt = dx * ν`, is **not** a law of nature — just
+a choice that happens to satisfy every rule at `ν = 0.07` on a 101-point grid. It
+fails in both directions: raise `ν` tenfold and it gives `σ = 4.3`, `r = 7.8`, and
+`NaN` within a few steps (Experiment A); refine to `nx = 401` and `r = ν²/Δx` pushes
+`σ + 2r` to 1.11 (Experiment C). Check it; never trust it.
 
 ---
 
@@ -207,6 +244,9 @@ Algorithm:
 
 - [ ] Before running: compute both `Δt` limits (`Δx/u_max` and `Δx²/2ν`) and the
       actual `dt = dx·ν`. Which rule is binding? By what margin does each hold?
+- [ ] Before running: compute `σ + 2r`. It must be `≤ 1`. This is the rule that
+      actually governs and it is stricter than the two above — a run can pass both
+      of them and still oscillate. Baseline should give `σ + 2r ≈ 0.65`.
 - [ ] Plot `u(x, 0)` alone. Is it periodic — is `u[1] == u[nx]` to ~`1e-12`? If not,
       stop; nothing after this matters.
 - [ ] Predict, then run: which way does the saw-tooth travel, and roughly how fast?
@@ -218,17 +258,37 @@ Algorithm:
 - [ ] Something left the right edge and came back on the left — find the time step
       where the front crosses the seam and confirm the wrap looks smooth there.
 - [ ] Experiment A — `ν = 0.7` (ten times more viscous), same everything else.
-      Recompute `dt` (it changes!). Predict the front's sharpness first, then look.
-- [ ] Experiment B — `ν = 0.007`. Same drill. What is now the binding stability
-      rule? Does the numerical front stay as thin as the exact one, or does the
-      scheme's own numerical diffusion take over? (Compare against the exact
-      solution — this is the check you could not do before Step 4.)
-- [ ] Experiment C — refine to `nx = 201` with `dt = dx·ν` again. Does the error
-      against the exact solution shrink? By roughly what factor? Is that consistent
-      with a first-order-in-time, first-order-upwind scheme?
-- [ ] Experiment D — turn viscosity off entirely, `ν = 0` (keep `dt` from the `ν=0.07`
-      run so the scheme is otherwise identical). What is the equation now? What
-      happens to the front, and what is holding the solution together?
+      Keep `dt = dx·ν` for the first run: it blows up to `NaN`, and working out why
+      *before* looking is the point (`dt` rises tenfold while the diffusion limit
+      `Δx²/2ν` falls tenfold — a hundredfold swing in `r`). Then switch to the
+      `σ + 2r` recipe from §3.3 and rerun to see the physics: how wide is the front
+      now, in grid cells, and what happened to the error?
+- [ ] Experiment B — `ν = 0.007`, using the `σ + 2r` recipe for `dt`. Which rule is
+      binding now? Measure the front width in grid cells for both the exact and the
+      numerical profile. They will not agree: first-order upwind cannot render a
+      front thinner than about two or three cells, so below that width what you see
+      is the scheme's own numerical diffusion, not `ν`. This is the check you could
+      not do before Step 4 — without the exact curve you would read the numerical
+      front as physics.
+- [ ] Experiment C — refine to `nx = 201`. **Watch the clock**: with `dt = dx·ν`,
+      halving `Δx` halves `dt`, so `nt = 100` now stops at half the physical time.
+      Double `nt` to 200 before comparing errors, or you are crediting the grid for
+      a shorter run. At equal physical time `max_error` falls only about 10% while
+      the *mean* error falls about a third — at a near-discontinuity `max_error`
+      reports only the shock's position error and hides the 190 points that did
+      improve. Prefer the mean.
+- [ ] Experiment C, continued — refine again to `nx = 401` with `dt = dx·ν`. The
+      binding rule flips to diffusion, and `σ + 2r` reaches 1.11, so the recipe is
+      now illegal and the error *grows*. Redo it with the §3.3 recipe.
+- [ ] Experiment D — turn viscosity off in the **solver only**. Setting `ν = 0`
+      everywhere does not work: `ν` sits in the denominator of `φ`, so the exact
+      solution and the initial condition both collapse to `NaN` and every curve
+      vanishes from the plot. Keep `ν = 0.07` for the initial condition and set the
+      separate `nu_solver = 0.0` that the notebook defines for exactly this purpose.
+      `max_error` is meaningless here — the exact solution solves a different
+      equation than the one you are now integrating, so judge the numerical profile
+      on its own. What is the equation now? What happens to the front, and what is
+      holding the solution together?
 
 Record every result in `docs/parameters.md` §5.
 

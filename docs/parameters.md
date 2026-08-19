@@ -117,10 +117,17 @@ The three regimes, all of which you have now seen with your own numbers:
 
 ## 5. Every experiment so far, in one table
 
-Domain `L = 2`, hat initial condition (`u = 2` on `0.5 ≤ x ≤ 1`, else `u = 1`).
+Domain `L = 2`, hat initial condition (`u = 2` on `0.5 ≤ x ≤ 1`, else `u = 1`) —
+**except the Step 4 rows**, which use `L = 2π`, a periodic ring, and the saw-tooth
+taken from the exact solution.
 
 The stability column holds `σ` for the convection runs and `r` for the diffusion
-ones — each step's own stability number.
+ones — each step's own stability number. Step 4 has both at once, so it also carries
+`σ + 2r`, the rule that actually governs (see `step04_burgers.md` §3.3).
+
+Step 4 reports a **front width in grid cells** (`argmin(u) - argmax(u)`). That one
+number explains every Step 4 result: the scheme is accurate where the front spans
+many cells and invents its own answer where it spans few.
 
 | Run | `nx` | `dx` | `dt` | `σ` / `r` | What came out |
 |---|---|---|---|---|---|
@@ -135,6 +142,14 @@ ones — each step's own stability number.
 | Step 3 **B** — refined grid | 81 | 0.025 | 0.000417 | `r = 0.2` | `dt` fell to a **quarter**, so `nt = 20` only reached `t = 0.0083` — the crisper picture is an *earlier* one, not a better one. `nt = 80` reproduces the baseline (max difference `0.035`, the finer grid being the more accurate) at **8× the work** |
 | Step 3 **C** — weaker `ν` | 41 | 0.05 | 0.01667 | `r = 0.2` | `ν = 0.03`: `dt` ×10, `t` ×10, profile **bitwise identical** to the baseline (also checked at `ν = 3.0`). Deriving `dt` from `r` cancels `ν` out of the update entirely; only the product `ν·t = 0.01` decides the shape |
 | Step 3 **D** — long run | 41 | 0.05 | 0.001667 | `r = 0.2` | `nt = 500`: the bump reaches the clamped ends and starts **leaking**. Area `0.550 → 0.338` (61% left), peak `→ 1.27`, crest drifting from `x = 0.75` toward `x = 1`. By `nt = 5000` only 0.2% remains; the steady state is `u ≡ 1` |
+| Step 4 baseline (`ν = 0.07`) | 101 | 0.0628 | 0.004398 | `σ = 0.490`, `r = 0.078`, `σ+2r = 0.65` | Front spans **4 cells** at `t=0`, 10 in the numerical profile at `t_end = 0.4398`. Saw-tooth travels at `≈3.86` (the `+4` of the exact solution). `max_error = 3.753` — but that is *entirely* the front: 91 of 101 points are inside `0.1` and the mean error is `0.184`. Numerical peak `5.717` vs exact `6.039`, lagging **6 cells**. Seam stays at `0.0` |
+| Step 4 **A** — `ν = 0.7`, course recipe | 101 | 0.0628 | 0.04398 | `σ = 4.33`, `r = 7.80`, `σ+2r = 19.9` | **`NaN` within a few steps.** `dt = dx·ν` rises ×10 while the diffusion limit `dx²/2ν` falls ×10 — a **100×** swing in `r` (`0.078 → 7.80`). Every curve disappears from the plot, `u_num` being all `NaN`. `t_end` also silently became `4.398`, ten times the baseline |
+| Step 4 **A** — `ν = 0.7`, `σ+2r` recipe | 101 | 0.0628 | 0.00166 | `σ = 0.163`, `r = 0.294`, `σ+2r = 0.752` | Front spans **25 cells** (exact) / 27 (numerical) — ten times the viscosity, ten times the width. `max_error = 0.139` and mean `0.024`: **27× better than the baseline on the same grid**. Numerical peak `5.699` vs exact `5.771`, lagging 1 cell. Peak fell `0.41` and the trough rose `0.41` — diffusion moves, it does not destroy |
+| Step 4 **B** — `ν = 0.007` | 101 | 0.0628 | 0.006113 | `σ = 0.689`, `r = 0.011`, `σ+2r = 0.710` | Convection binds by 32× (`0.00888` vs `0.282`). Exact front is **2 cells**; the numerical one is **6** — first-order upwind cannot draw a front thinner than two or three cells, so the width on screen is the *scheme's*, not `ν`'s. Shock lags **12 cells**, `max_error = 3.903`, mean `0.382`. Without the exact curve you would read the 6-cell ramp as physics |
+| Step 4 **C** — `nx = 201`, `nt = 100` | 201 | 0.0314 | 0.002199 | `σ = 0.490`, `r = 0.156`, `σ+2r = 0.802` | **Trap:** `dt = dx·ν` halved, so `nt = 100` stops at `t = 0.2199`, half the baseline. `max_error = 2.981` looks like progress and is mostly just the shorter run |
+| Step 4 **C** — `nx = 201`, `nt = 200` (equal `t`) | 201 | 0.0314 | 0.002199 | `σ = 0.490`, `r = 0.156`, `σ+2r = 0.802` | Front `4 → 8` cells. Honest comparison: `max_error` `3.753 → 3.382` (**−10%**) while the mean falls `0.184 → 0.121` (**−34%**) and points inside `0.1` go 90% → 93%. At a near-discontinuity `max_error` reports only where the shock sits — **use the mean for refinement studies** |
+| Step 4 **C** — `nx = 401`, `nt = 400` | 401 | 0.0157 | 0.0011 | `σ = 0.490`, `r = 0.312`, **`σ+2r = 1.11`** | The binding rule **flips to diffusion** (`0.001762` vs `0.002246`) exactly as §3.3 predicts, and the recipe becomes illegal: `r = ν²/Δx` grows as the grid refines. `max_error` *rises* to `4.16`, shock lag `51` cells. Refining a grid under a bad `dt` recipe makes things worse |
+| Step 4 **D** — `nu_solver = 0` | 101 | 0.0628 | 0.004398 | `σ = 0.490`, `r = 0`, `σ+2r = 0.49` | Physical viscosity switched off in the scheme alone; peak `5.720` vs `5.717` **with** viscosity — no measurable difference, because the scheme's own numerical diffusion was already the larger of the two. Front `6` cells rather than `10`, and it keeps **thickening with no diffusion term in the equation**: 6 → 8 → 17 → 32 cells at `nt = 100, 300, 1000, 3000`, peak decaying `5.72 → 3.53`. Control run: swap upwind for a central difference (removing the scheme's diffusion) and it blows to `27.8` with negative velocities by `nt = 100`. **The inaccuracy of upwind is what keeps it stable** |
 
 ---
 
