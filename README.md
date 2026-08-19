@@ -50,14 +50,14 @@ Then open `src/stepNN_*.jl` from the Pluto home page.
 | [`docs/parameters.md`](docs/parameters.md) | `nx`, `dx`, `dt`, `σ` — what each knob does, and every experiment's result in one table. | ✅ |
 | [`docs/step00_foundations.md`](docs/step00_foundations.md) | One equation becomes one line of code. | ✅ |
 
-**Phase 1 — 1-D** 🔄 *(build the whole core pattern)*
+**Phase 1 — 1-D** ✅ *(the whole core pattern, built four times)*
 
 - [x] Step 1 ⭐ — 1-D Linear Convection — [doc](docs/step01_linear_convection.md) · [notebook](src/step01_linear_convection.jl) ✅ *(solved: σ=0.5 diffuses, σ=1 is exact, σ=1.25 blows up)*
 - [x] Step 2 ⭐ — 1-D Nonlinear Convection — [doc](docs/step02_nonlinear_convection.md) · [notebook](src/step02_nonlinear_convection.jl) ✅ *(solved: the bump steepens into a shock and outruns the linear one)*
 - [x] Step 3 ⭐⭐ — 1-D Diffusion — [doc](docs/step03_diffusion.md) · [notebook](src/step03_diffusion.jl) ✅ *(solved: corners die first and the flat top holds until the slopes eat it; `r>1/2` saws the grid apart at exactly `|1-4r|` per step; `ν` cancels out of the update; clamped ends drain the bump to `u ≡ 1`)*
-- [ ] Step 4 ⭐⭐⭐ — 1-D Burgers' Equation — [doc](docs/step04_burgers.md) · [notebook](src/step04_burgers.jl) 🔄 *(convection + diffusion in one equation; periodic domain; first step with an exact solution to measure error against)*
+- [x] Step 4 ⭐⭐⭐ — 1-D Burgers' Equation — [doc](docs/step04_burgers.md) · [notebook](src/step04_burgers.jl) ✅ *(solved: `σ ≤ 1` and `r ≤ 1/2` are each necessary and together still not sufficient — the merged update is a weighted average, so `σ + 2r ≤ 1` is what governs; upwind cannot draw a front thinner than two or three cells, so at `ν = 0.007` the width on screen is the scheme's, not `ν`'s; `max_error` only reports where the shock sits, the mean is the honest refinement measure; switching `ν` off in the solver alone changes almost nothing, while a central difference in its place blows up — upwind's inaccuracy is what holds it together)*
 
-**Phase 2 — 2-D** *(same ideas, one more dimension)*
+**Phase 2 — 2-D** 🔜 *(next: same ideas, one more index)*
 
 - [ ] Step 5 — 2-D Linear Convection
 - [ ] Step 6 — 2-D Nonlinear Convection

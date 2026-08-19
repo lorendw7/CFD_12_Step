@@ -101,9 +101,29 @@ $$r = \frac{\nu\,\Delta t}{\Delta x^{2}} \le \frac{1}{2}
 \Delta t \le \frac{\Delta x^{2}}{2\nu}$$
 
 Because `Δx` is squared, doubling `nx` forces `Δt` down by **four**, so the same
-physical time costs eight times the work. Both rules apply at once from Step 4 on,
-where convection and diffusion appear in the same equation — the allowed `Δt` is
-then the smaller of the two.
+physical time costs eight times the work.
+
+### When both are active, neither rule is the rule
+
+From Step 4 on, convection and diffusion sit in the same equation, and taking the
+smaller of the two limits above is **necessary but not sufficient**. Collect the
+merged update as a weighted average of the three old values:
+
+```
+u[i]_new  =  r·u[i+1]  +  (1 − σ − 2r)·u[i]  +  (σ + r)·u[i-1]
+```
+
+The weights sum to 1, so the new value is a genuine average — and cannot leave the
+range it averages — exactly while none of them is negative. Only the middle one can
+be, so what governs is
+
+$$\sigma + 2r \le 1
+\qquad\Longleftrightarrow\qquad
+\Delta t \le \frac{1}{\dfrac{u_{\max}}{\Delta x} + \dfrac{2\nu}{\Delta x^{2}}}$$
+
+Measured: `σ = 0.25` with `r = 0.45` clears both separate rules and still dips to
+`u = −1.09` with 57 sign changes along the profile. Full derivation in
+`step04_burgers.md` §3.3.
 
 The three regimes, all of which you have now seen with your own numbers:
 
