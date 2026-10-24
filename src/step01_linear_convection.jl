@@ -29,7 +29,7 @@ md"## 1. Parameters"
 
 # ╔═╡ a1000000-0000-0000-0000-000000000004
 begin
-	nx = 81                 # number of grid points
+	nx = 41                 # number of grid points; change to 81 in the experiment
 	L  = 2.0                # domain length
 	dx = L / (nx - 1)       # grid spacing Δx
 	nt = 25                 # number of time steps
@@ -88,7 +88,7 @@ end
 md"""
 ## 5. Self-test
 
-- Courant number σ = c·dt/dx = $(c*0.025/(2.0/40)) — is it ≤ 1?
+- Courant number σ = c·dt/dx = $(c*dt/dx) — is it ≤ 1?
 - TODO (in words, here): why `i in 2:nx` and not `1:nx`?
 - TODO experiment: change `nx = 81` above and re-run. Predict first, then observe.
 """

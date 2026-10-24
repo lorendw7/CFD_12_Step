@@ -17,9 +17,20 @@ intuition first. **You write all the code yourself**; the repo only gives you
 **Keywords**: CFD · Navier–Stokes · finite difference · Julia · Pluto notebooks ·
 numerical PDE · learn-by-doing
 
+## Start here
+
+First-time learners should begin with [`docs/README.md`](docs/README.md). It
+explains the learning order, where to write code, and how to work through each
+step with a tutor or study partner.
+
+> The checkmarks below mean that the repository provides the corresponding
+> lesson and reference implementation. They do not represent an individual
+> learner's progress. Use the checkpoints in `docs/README.md` to track mastery.
+
 ## How to use this repo
 
 For each step:
+
 1. **Read** the doc in `docs/` (English). Concept → everyday analogy → minimal math.
 2. **Hear** the bilingual walkthrough in chat; ask anything.
 3. **Code** it yourself by filling the `# TODO`s in the matching `src/*.jl` Pluto notebook.
@@ -30,10 +41,16 @@ For each step:
 ## Setup
 
 Julia 1.10. Packages live in `Project.toml` (already set up: `Pluto`, `PlutoUI`,
-`Plots`). To launch the interactive notebooks:
+`Plots`). From the repository root, install the locked dependencies once:
 
 ```bash
-julia --project=. -e 'using Pluto; Pluto.run()'
+julia --startup-file=no --project=. -e 'using Pkg; Pkg.instantiate()'
+```
+
+Then launch the interactive notebooks:
+
+```bash
+julia --startup-file=no --project=. -e 'using Pluto; Pluto.run()'
 ```
 
 Then open `src/stepNN_*.jl` from the Pluto home page.
